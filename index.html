@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Math Valbuena — Photography</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Tipografía moderna (ligera) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================
+       BASE / THEME
+    ========================== */
+        :root {
+            --bg: #0b0b0b;
+            --bg-2: #000;
+            --txt: #ffffff;
+            --muted: rgba(255, 255, 255, .68);
+            --line: rgba(255, 255, 255, .14);
+            --accent: #c6a96b;
+            /* dorado suave */
+            --shadow: 0 30px 80px rgba(0, 0, 0, .55);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--txt);
+            font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font: inherit;
+            color: inherit;
+            background: none;
+            border: 0;
+            cursor: pointer;
+        }
+
+        /* =========================
+       NAV (minimal, fixed)
+    ========================== */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(0, 0, 0, .72);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .nav__inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav__link {
+            font-size: 12px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            padding: 10px 10px;
+            border-radius: 999px;
+            color: rgba(255, 255, 255, .86);
+            transition: transform .15s ease, background .15s ease, color .15s ease;
+            user-select: none;
+        }
+
+        .nav__link:hover {
+            background: rgba(255, 255, 255, .06);
+            transform: translateY(-1px);
+        }
+
+        .nav__link[aria-current="page"] {
+            color: var(--accent);
+            background: rgba(198, 169, 107, .10);
+            border: 1px solid rgba(198, 169, 107, .25);
+        }
+
+        /* =========================
+       PAGE WRAP
+    ========================== */
+        .wrap {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 92px 16px 48px;
+            /* espacio por nav fixed */
+        }
+
+        /* Header minimal (opcional, estilo “muy limpio”) */
+        .header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 0 18px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 18px;
+        }
+
+        .header__title {
+            font-size: 16px;
+            letter-spacing: .02em;
+            font-weight: 400;
+            margin: 0;
+        }
+
+        .header__meta {
+            font-size: 12px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            border-radius: 999px;
+            background: var(--accent);
+            margin: 0 10px 2px;
+            opacity: .9;
+        }
+
+        /* =========================
+       GRID (galería)
+    ========================== */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            padding-top: 14px;
+        }
+
+        /* tablet */
+        @media (min-width: 720px) {
+            .grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .header__title {
+                font-size: 18px;
+            }
+        }
+
+        /* desktop */
+        @media (min-width: 1024px) {
+            .grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 12px;
+            }
+        }
+
+        .card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg-2);
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+            transform: translateZ(0);
+        }
+
+        .card__btn {
+            width: 100%;
+            display: block;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .thumb {
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            object-fit: cover;
+            display: block;
+            filter: saturate(1.02) contrast(1.02);
+            transform: scale(1);
+            transition: transform .35s ease, opacity .35s ease;
+            opacity: .95;
+        }
+
+        .card:hover .thumb {
+            transform: scale(1.03);
+            opacity: 1;
+        }
+
+        /* Overlay sutil al hover (cinematográfico) */
+        .card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, .55));
+            opacity: 0;
+            transition: opacity .25s ease;
+            pointer-events: none;
+        }
+
+        .card:hover::after {
+            opacity: 1;
+        }
+
+        .card__label {
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            letter-spacing: .10em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .88);
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity .25s ease, transform .25s ease;
+            pointer-events: none;
+        }
+
+        .card:hover .card__label {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card__label span {
+            color: var(--accent);
+        }
+
+        /* =========================
+       SECCIONES texto (About / Contact)
+    ========================== */
+        .section {
+            display: none;
+            max-width: 860px;
+            padding: 22px 0 0;
+            animation: fadeIn .18s ease both;
+        }
+
+        .section h2 {
+            margin: 0 0 12px;
+            font-weight: 400;
+            letter-spacing: .02em;
+        }
+
+        .section p {
+            margin: 0 0 12px;
+            color: var(--muted);
+            line-height: 1.75;
+            font-weight: 300;
+        }
+
+        .section a {
+            color: var(--accent);
+            border-bottom: 1px solid rgba(198, 169, 107, .35);
+        }
+
+        /* =========================
+       MODAL / OVERLAY PROJECT
+    ========================== */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            display: none;
+            background: rgba(0, 0, 0, .92);
+            backdrop-filter: blur(6px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 18px 12px 40px;
+            animation: fadeIn .18s ease both;
+        }
+
+        .overlay__top {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 6px;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, .92), rgba(0, 0, 0, .35));
+            border-bottom: 1px solid rgba(255, 255, 255, .10);
+        }
+
+        .overlay__title {
+            margin: 0;
+            font-size: 12px;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            font-weight: 400;
+            color: rgba(255, 255, 255, .92);
+        }
+
+        .overlay__close {
+            border: 1px solid rgba(255, 255, 255, .35);
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            transition: transform .15s ease, border-color .15s ease, color .15s ease, background .15s ease;
+        }
+
+        .overlay__close:hover {
+            transform: translateY(-1px);
+            border-color: rgba(198, 169, 107, .55);
+            color: var(--accent);
+            background: rgba(198, 169, 107, .08);
+        }
+
+        .overlay__content {
+            max-width: 980px;
+            margin: 0 auto;
+            padding-top: 16px;
+        }
+
+        .overlay__img {
+            width: 100%;
+            display: block;
+            margin: 0 0 12px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        /* =========================
+       ANIMATIONS
+    ========================== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Accesibilidad: reducir motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+
+            html {
+                scroll-behavior: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav class="nav" aria-label="Navegación principal">
+        <div class="nav__inner">
+
+            <a class="nav__link" href="#" data-view="about">About</a>
+            <a class="nav__link" href="#" data-view="gallery" data-filter="photography">Photography</a>
+            <a class="nav__link" href="#" data-view="gallery" data-filter="films">Films</a>
+            <a class="nav__link" href="#" data-view="gallery" data-filter="exhibitions">Exhibitions</a>
+            <a class="nav__link" href="#" data-view="gallery" data-filter="books">Books</a>
+            <a class="nav__link" href="#" data-view="gallery" data-filter="all" aria-current="page">All</a>
+            <a class="nav__link" href="#" data-view="contact">Contact</a>
+        </div>
+    </nav>
+
+    <main class="wrap">
+
+        <header class="header">
+            <h1 class="header__title">Math Valbuena</h1>
+            <div class="header__meta">
+                Colombia <span class="dot"></span> Portafolio
+            </div>
+        </header>
+
+        <!-- GALLERY -->
+        <section id="galleryView">
+            <div class="grid" id="grid"></div>
+        </section>
+
+        <!-- ABOUT -->
+        <section class="section" id="aboutView">
+            <h2>About</h2>
+            <p>
+                Fotógrafia basada en Colombia, enfocada en música, conciertos y cultura en vivo.
+            </p>
+            <p>
+                Dirección artística minimal, estética cinematográfica, y narrativa documental.
+            </p>
+        </section>
+
+        <!-- CONTACT -->
+        <section class="section" id="contactView">
+            <h2>Contact</h2>
+            <p>
+                Instagram: <a href="#" aria-label="Instagram">@valbuenamath</a><br>
+                Email: <a href="mailto:contacto@email.com">contacto@email.com</a>
+            </p>
+        </section>
+    </main>
+
+    <!-- OVERLAY / MODAL -->
+    <aside class="overlay" id="overlay" aria-hidden="true">
+        <div class="overlay__top">
+            <p class="overlay__title" id="overlayTitle">Project</p>
+            <button class="overlay__close" id="overlayClose" type="button">Close</button>
+        </div>
+
+        <div class="overlay__content" id="overlayContent">
+
+        </div>
+    </aside>
+
+    <aside class="overlay" id="overlay" aria-hidden="true">
+        <div class="overlay__top">
+            <p class="overlay__title" id="overlayTitle">Project</p>
+            <button class="overlay__close" id="overlayClose" type="button">Close</button>
+        </div>
+
+        <div class="overlay__content" id="overlayContent">
+
+        </div>
+    </aside>
+
+    <script>
+
+        const PROJECTS = [
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "photography",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+
+
+            {
+                id: "festival-x-2024",
+                title: "Festival X — 2024",
+                category: "photography",
+                cover: "images/festivales/2024/festival-x/cover 1.2.jpeg",
+                images: [
+                    "images/festivales/2024/festival-x/01.jpeg",
+                    "images/festivales/2024/festival-x/02.jpeg",
+                    "images/festivales/2024/festival-x/03.jpeg",
+                ]
+            },
+
+            {
+                id: "festival-x-2024",
+                title: "Festival X — 2024",
+                category: "exhibitions",
+                cover: "images/festivales/2024/festival-x/cover 1.2.jpeg",
+                images: [
+                    "images/festivales/2024/festival-x/01.jpeg",
+                    "images/festivales/2024/festival-x/02.jpeg",
+                    "images/festivales/2024/festival-x/03.jpeg",
+                ]
+            },
+
+            {
+                id: "festival-x-2024",
+                title: "Festival X — 2024",
+                category: "exhibitions",
+                cover: "images/festivales/2024/festival-x/cover 1.2.jpeg",
+                images: [
+                    "images/festivales/2024/festival-x/01.jpeg",
+                    "images/festivales/2024/festival-x/02.jpeg",
+                    "images/festivales/2024/festival-x/03.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "books",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "books",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "books",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "books",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "films",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "films",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+            {
+                id: "gregory-porter-2017",
+                title: "Gregory Porter — 2017",
+                category: "films",
+                cover: "images/conciertos/2017/gregory-porter/cover.jpeg",
+                images: [
+                    "images/conciertos/2017/gregory-porter/gregoryporter-1.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-2.jpeg",
+                    "images/conciertos/2017/gregory-porter/gregoryporter-3.jpeg",
+                ]
+            },
+
+
+            {
+                id: "festival-x-2024",
+                title: "Festival X — 2024",
+                category: "exhibitions",
+                cover: "images/festivales/2024/festival-x/cover 1.2.jpeg",
+                images: [
+                    "images/festivales/2024/festival-x/01.jpeg",
+                    "images/festivales/2024/festival-x/02.jpeg",
+                    "images/festivales/2024/festival-x/03.jpeg",
+                ]
+            }
+        ];
+
+        // =========================
+        // STATE
+        // =========================
+        let currentFilter = "all";
+
+        // =========================
+        // ELEMENTS
+        // =========================
+        const grid = document.getElementById("grid");
+        const overlay = document.getElementById("overlay");
+        const overlayTitle = document.getElementById("overlayTitle");
+        const overlayContent = document.getElementById("overlayContent");
+        const overlayClose = document.getElementById("overlayClose");
+
+        const galleryView = document.getElementById("galleryView");
+        const aboutView = document.getElementById("aboutView");
+        const contactView = document.getElementById("contactView");
+
+        const navLinks = document.querySelectorAll(".nav__link");
+
+        // =========================
+        // RENDER GRID
+        // =========================
+        function renderGrid() {
+            grid.innerHTML = "";
+
+            const list = PROJECTS.filter(p => currentFilter === "all" ? true : p.category === currentFilter);
+
+            list.forEach(project => {
+                const card = document.createElement("article");
+                card.className = "card";
+
+                const btn = document.createElement("button");
+                btn.className = "card__btn";
+                btn.type = "button";
+                btn.setAttribute("aria-label", `Abrir proyecto ${project.title}`);
+                btn.addEventListener("click", () => openProject(project.id));
+
+                const img = document.createElement("img");
+                img.className = "thumb";
+                img.src = project.cover;
+                img.alt = project.title;
+                img.loading = "lazy";
+
+                const label = document.createElement("div");
+                label.className = "card__label";
+                label.innerHTML = `${escapeHtml(project.title)} <span>•</span> ${escapeHtml(project.category)}`;
+
+                btn.appendChild(img);
+                card.appendChild(btn);
+                card.appendChild(label);
+                grid.appendChild(card);
+            });
+        }
+
+        // =========================
+        // OPEN / CLOSE OVERLAY
+        // =========================
+        function openProject(id) {
+            const project = PROJECTS.find(p => p.id === id);
+            if (!project) return;
+
+            overlayTitle.textContent = project.title;
+            overlayContent.innerHTML = "";
+
+            project.images.forEach(src => {
+                const img = document.createElement("img");
+                img.className = "overlay__img";
+                img.src = src;
+                img.alt = project.title;
+                img.loading = "lazy";
+                overlayContent.appendChild(img);
+            });
+
+            overlay.style.display = "block";
+            overlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+
+            // UX: llevar al top del overlay
+            overlay.scrollTop = 0;
+
+            // Accesibilidad básica: foco al botón cerrar
+            overlayClose.focus();
+        }
+
+        function closeOverlay() {
+            overlay.style.display = "none";
+            overlay.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "auto";
+        }
+
+        overlayClose.addEventListener("click", closeOverlay);
+
+        // cerrar con ESC
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && overlay.style.display === "block") closeOverlay();
+        });
+
+        // click fuera de contenido (opcional, muy útil)
+        overlay.addEventListener("click", (e) => {
+            // si clickeas el fondo, cierra (pero no si clickeas imágenes)
+            if (e.target === overlay) closeOverlay();
+        });
+
+        // =========================
+        // NAV: VIEWS + FILTERS
+        // =========================
+        function hideAllViews() {
+            galleryView.style.display = "none";
+            aboutView.style.display = "none";
+            contactView.style.display = "none";
+        }
+
+        function setActiveNav(el) {
+            navLinks.forEach(a => a.removeAttribute("aria-current"));
+            el.setAttribute("aria-current", "page");
+        }
+
+        function showGallery(filter) {
+            hideAllViews();
+            galleryView.style.display = "block";
+            currentFilter = filter || "all";
+            renderGrid();
+        }
+
+        function showAbout() {
+            hideAllViews();
+            aboutView.style.display = "block";
+        }
+
+        function showContact() {
+            hideAllViews();
+            contactView.style.display = "block";
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+
+                setActiveNav(link);
+
+                const view = link.dataset.view;
+                if (view === "about") return showAbout();
+                if (view === "contact") return showContact();
+
+                // gallery con filtro
+                const filter = link.dataset.filter || "all";
+                showGallery(filter);
+            });
+        });
+
+        // =========================
+        // HELPERS
+        // =========================
+        function escapeHtml(str) {
+            return String(str)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        // =========================
+        // INIT
+        // =========================
+        showGallery("all");
+    </script>
+</body>
+
+</html>
